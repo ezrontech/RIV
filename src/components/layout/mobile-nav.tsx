@@ -14,9 +14,9 @@ import { cn } from "@/lib/utils";
 const TAB_ITEMS = [
     { label: "Menu", icon: Menu, action: "toggle_sidebar" },
     { href: "/community", label: "Streams", icon: Waves },
-    { href: "/channels", label: "Channels", icon: Tv },
-    { href: "/podcasts", label: "Podcasts", icon: Mic },
-    { href: "/articles", label: "Articles", icon: Scroll },
+    { href: "/workshops", label: "Workshops", icon: Hammer },
+    { href: "/retreats", label: "Retreats", icon: Tent },
+    { href: "/shop", label: "Shop", icon: ShoppingBag },
 ];
 
 // Full Sidebar Items for the Drawer
