@@ -1,5 +1,6 @@
 import { LeftSidebar } from "@/components/layout/left-sidebar";
 import { RightSidebar } from "@/components/layout/right-sidebar";
+import { MobileNav } from "@/components/layout/mobile-nav";
 
 export default function CommunityLayout({
     children,
@@ -19,6 +20,7 @@ export default function CommunityLayout({
             </main>
 
             <RightSidebar />
+            <MobileNav />
         </div>
     );
 }
