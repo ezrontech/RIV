@@ -20,7 +20,7 @@ export function RightSidebar() {
             <div className="mb-8">
                 <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
                     <Calendar size={20} className="text-rasta-red" />
-                    Pageantry & Ceremonies
+                    Ceremonies & Retreats
                 </h3>
                 <div className="space-y-4">
                     {[

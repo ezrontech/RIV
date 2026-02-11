@@ -64,7 +64,7 @@ export default function ChannelsPage() {
             <SearchBar placeholder="Search shows, series, and episodes..." />
 
             {/* Category Pills (Sticky) */}
-            <div className="sticky top-[73px] z-20 bg-background/95 backdrop-blur-sm border-b border-foreground/5 py-3 px-4 mb-6">
+            <div className="sticky top-[80px] z-20 bg-background/95 backdrop-blur-sm border-b border-foreground/5 py-3 px-4 mb-6">
                 <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
                     {CATEGORIES.map((cat) => (
                         <button

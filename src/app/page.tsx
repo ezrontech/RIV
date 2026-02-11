@@ -30,7 +30,7 @@ export default function Home() {
             <img src="/riv-logo.webp" alt="RIV Logo" className="w-full h-auto drop-shadow-2xl" />
           </div>
 
-          <h1 className="text-4xl md:text-7xl font-black tracking-tight leading-tight max-w-4xl drop-shadow-lg">
+          <h1 className="text-3xl md:text-7xl font-black tracking-tight leading-tight max-w-4xl drop-shadow-lg">
             Preserving Traditions.<br />
             Protecting Nature.<br />
             <span className="text-rasta-yellow">Promoting Life.</span>

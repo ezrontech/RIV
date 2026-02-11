@@ -5,19 +5,25 @@ import { ShoppingBag, Search, Store, ArrowRight, Star, Heart } from "lucide-reac
 import { cn } from "@/lib/utils";
 import { SearchBar } from "@/components/ui/search-bar";
 
+import { useState } from "react";
+
 export default function ShopPage() {
+    const [searchQuery, setSearchQuery] = useState("");
 
     // Simulate "Vendors" from Channels/Users for variety
     const vendors = [
-        { id: 'v1', name: 'Sister Irie', avatar: MOCK_USERS[1].avatar, category: 'Food & Spices', rating: 4.9 },
-        { id: 'v2', name: 'Ras Tafari Youth', avatar: MOCK_USERS[2].avatar, category: 'Crafts', rating: 4.8 },
-        { id: 'v3', name: 'Elder Bongo', avatar: MOCK_USERS[0].avatar, category: 'Woodwork', rating: 5.0 },
-        { id: 'v4', name: 'Mama Africa', avatar: MOCK_USERS[3].avatar, category: 'Herbal Medicine', rating: 4.9 },
+        { id: 'v1', name: 'Sister Arlene', avatar: MOCK_USERS[5].avatar, category: 'Food & Spices', rating: 4.9 },
+        { id: 'v2', name: 'King Tebah', avatar: MOCK_USERS[6].avatar, category: 'Crafts', rating: 4.8 },
+        { id: 'v3', name: 'Elder Baaba', avatar: MOCK_USERS[0].avatar, category: 'Woodwork', rating: 5.0 },
+        { id: 'v4', name: 'Ras Sugah', avatar: MOCK_USERS[7].avatar, category: 'Herbal Medicine', rating: 4.9 },
     ];
 
     const getVendorAvatar = (artisanName: string) => {
         const vendor = vendors.find(v => v.name === artisanName);
-        return vendor ? vendor.avatar : '/images/riv-logo.webp';
+        if (vendor) return vendor.avatar;
+
+        const user = MOCK_USERS.find(u => u.name === artisanName);
+        return user ? user.avatar : '/images/riv-logo.webp';
     };
 
     const categories = ["All", "Crafts", "Food", "Clothing", "Herbs", "Instruments"];
@@ -25,10 +31,10 @@ export default function ShopPage() {
     return (
         <div className="min-h-screen bg-background text-foreground flex flex-col pb-20">
             {/* Header / Search */}
-            <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b border-foreground/5 py-3 px-4 flex flex-col gap-3">
+            <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b border-foreground/5 p-4 flex flex-col gap-3">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="font-black text-xl tracking-tight">Village Market</h1>
+                        <h1 className="font-black text-xl tracking-tight">Artisan Shop</h1>
                         <p className="text-xs text-foreground/60 font-medium">Support Local Artisans</p>
                     </div>
                     <div className="p-2 bg-foreground/5 rounded-full relative hover:bg-foreground/10 cursor-pointer transition-colors">
@@ -36,12 +42,14 @@ export default function ShopPage() {
                         <span className="absolute -top-1 -right-1 size-4 bg-rasta-red text-white text-[9px] font-bold flex items-center justify-center rounded-full border-2 border-background">2</span>
                     </div>
                 </div>
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40" size={16} />
+                <div className="relative group">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/50 group-focus-within:text-rasta-yellow transition-colors" size={20} />
                     <input
                         type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search for products, artisans..."
-                        className="w-full bg-foreground/5 rounded-xl py-2 pl-9 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-foreground/20 placeholder:text-foreground/40"
+                        className="w-full bg-foreground/5 border border-foreground/5 rounded-full py-3 pl-12 pr-6 text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-1 focus:ring-rasta-yellow/50 transition-all"
                     />
                 </div>
             </div>
@@ -49,13 +57,13 @@ export default function ShopPage() {
             <div className="flex flex-col gap-8 px-4 py-6">
 
                 {/* 1. Hero: Featured Vendor / Marketplace Highlight */}
-                <section className="relative aspect-[2/1] md:aspect-[3/1] rounded-2xl overflow-hidden shadow-lg group cursor-pointer">
-                    <img src="/images/IMG_6582-768x1024.jpg" alt="Market Day" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                <section className="relative aspect-[2/1] md:aspect-[3/1] rounded-2xl overflow-hidden shadow-xl group cursor-pointer border border-foreground/5">
+                    <img src="/images/shop/roots%20tonic.jpg" alt="Featured Roots Tonic" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                     <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
                     <div className="absolute inset-0 p-6 flex flex-col justify-center items-start">
                         <span className="px-2 py-1 bg-rasta-yellow text-black text-[10px] font-bold uppercase tracking-wider rounded mb-2">Market Day Special</span>
                         <h2 className="text-2xl md:text-3xl font-black text-white leading-tight mb-2">Fresh Harvest <br /> & Roots Tonic</h2>
-                        <p className="text-white/80 text-xs md:text-sm max-w-[200px] mb-4">Direct from Sister Irie's garden to your table. 100% Organic.</p>
+                        <p className="text-white/80 text-xs md:text-sm max-w-[200px] mb-4">Direct from Sister Arlene's garden to your table. 100% Organic.</p>
                         <button className="px-4 py-2 bg-white text-black text-xs font-bold rounded-full hover:bg-rasta-green hover:text-white transition-colors">Shop Collection</button>
                     </div>
                 </section>
@@ -95,7 +103,10 @@ export default function ShopPage() {
                 <section>
                     <h3 className="font-bold text-lg mb-3 px-1">Popular in the Village</h3>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {MOCK_PRODUCTS.map((product) => (
+                        {MOCK_PRODUCTS.filter(p =>
+                            p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            p.artisan.toLowerCase().includes(searchQuery.toLowerCase())
+                        ).map((product) => (
                             <div key={product.id} className="group flex flex-col gap-2 cursor-pointer">
                                 <div className="aspect-square w-full rounded-xl overflow-hidden bg-foreground/5 relative">
                                     <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />

@@ -6,14 +6,18 @@ import { PostCard } from "@/components/feed/post-card";
 import { MapPin, Calendar, Link as LinkIcon, Edit3 } from "lucide-react";
 
 export default function ProfilePage() {
-    // Simulating "Sister Irie" as logged in user for this view
+    // Simulating "Firstman" as logged in user for this view
     const user = MOCK_USERS[1];
     const userPosts = MOCK_POSTS.filter(p => p.user.id === user.id);
 
     return (
         <div className="min-h-screen bg-background text-foreground flex flex-col">
             {/* Header / Banner */}
-            <div className="relative h-48 bg-gradient-to-r from-rasta-green/20 via-rasta-yellow/20 to-rasta-red/20">
+            <div className="relative">
+                <div className="relative h-48 overflow-hidden">
+                    <img src="/images/River-768x424.jpg" alt="Banner" className="absolute inset-0 w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/10" />
+                </div>
                 <div className="absolute -bottom-12 left-6">
                     <div className="rounded-full p-1 bg-background">
                         <div className="size-24 rounded-full overflow-hidden border-4 border-background">
@@ -35,19 +39,18 @@ export default function ProfilePage() {
                 </div>
 
                 <p className="mt-4 max-w-lg text-foreground/80">
-                    Passionate about Ital cooking and preserving our traditions.
-                    Teaching the next generation about the healing power of herbs.
+                    Co-founder of Rastafari Indigenous Village (RIV) and advocate for the preservation of indigenous knowledge and cultural expression. Father, drummer, chanter, singer, songwriter, and orator.
                 </p>
 
                 <div className="flex gap-4 mt-4 text-sm text-foreground/50">
                     <div className="flex items-center gap-1"><MapPin size={14} /> Montego Bay, Jamaica</div>
-                    <div className="flex items-center gap-1"><LinkIcon size={14} /> irievibes.com</div>
+                    <div className="flex items-center gap-1"><LinkIcon size={14} /> rastavillage.com</div>
                     <div className="flex items-center gap-1"><Calendar size={14} /> Joined March 2024</div>
                 </div>
 
                 <div className="flex gap-6 mt-6 font-bold text-sm">
                     <div className="hover:underline cursor-pointer"><span>142</span> <span className="text-foreground/50 font-normal">Following</span></div>
-                    <div className="hover:underline cursor-pointer"><span>895</span> <span className="text-foreground/50 font-normal">Followers</span></div>
+                    <div className="hover:underline cursor-pointer"><span>90k</span> <span className="text-foreground/50 font-normal">Followers</span></div>
                 </div>
             </div>
 

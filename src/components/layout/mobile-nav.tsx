@@ -106,11 +106,11 @@ export function MobileNav() {
                             </button>
                             <div className="flex items-center gap-3 px-2">
                                 <div className="size-10 rounded-full bg-white/10 overflow-hidden">
-                                    <img src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=200" alt="User" />
+                                    <img src="/images/users/firstman.webp" alt="User" />
                                 </div>
                                 <div className="flex-1">
-                                    <div className="text-sm font-bold text-white">Sister Irie</div>
-                                    <div className="text-xs text-white/50">Member</div>
+                                    <div className="text-sm font-bold text-white">Firstman</div>
+                                    <div className="text-xs text-white/50">Community Elder</div>
                                 </div>
                                 <button className="text-white/50 hover:text-rasta-red transition-colors">
                                     <LogOut size={20} />
@@ -144,7 +144,7 @@ export function MobileNav() {
                                 key={index}
                                 href={item.href!}
                                 className={cn(
-                                    "flex flex-col items-center justify-center w-full h-full gap-1 transition-colors",
+                                    "flex flex-col items-center justify-center w-full h-full gap-1 transition-colors active:scale-95",
                                     isActive ? "text-rasta-yellow" : "text-foreground/60 hover:text-foreground"
                                 )}
                             >

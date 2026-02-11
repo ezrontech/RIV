@@ -3,9 +3,10 @@
 import { MOCK_RETREATS } from "@/lib/mock-data";
 import { Star, Heart, Clock, Check, Calendar, MapPin, ChevronRight, ChevronLeft } from "lucide-react";
 import { SearchBar } from "@/components/ui/search-bar";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 export default function RetreatsPage() {
+    const [searchQuery, setSearchQuery] = useState("");
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     const scrollLeft = () => {
@@ -20,13 +21,24 @@ export default function RetreatsPage() {
         }
     };
 
-    const villageRetreats = MOCK_RETREATS.filter(r => r.category === 'Village Retreats');
-    const ceremonies = MOCK_RETREATS.filter(r => r.category === 'Ceremonies');
-    const online = MOCK_RETREATS.filter(r => r.category === 'Online Experiences');
+    const filteredRetreats = MOCK_RETREATS.filter(r =>
+        r.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        r.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        r.category.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const villageRetreats = filteredRetreats.filter(r => r.category === 'Village Retreats');
+    const ceremonies = filteredRetreats.filter(r => r.category === 'Ceremonies');
+    const dayTours = filteredRetreats.filter(r => r.category === 'Day Tours');
+
 
     return (
         <div className="min-h-screen bg-background text-foreground flex flex-col pb-20">
-            <SearchBar placeholder="Search retreats, ceremonies, and online classes..." />
+            <SearchBar
+                placeholder="Search retreats, ceremonies, and online classes..."
+                value={searchQuery}
+                onChange={setSearchQuery}
+            />
 
             <div className="flex flex-col gap-12 p-6 overflow-hidden">
 
@@ -101,34 +113,46 @@ export default function RetreatsPage() {
                     </div>
                 </section>
 
-                {/* SECTION 3: Standard Grid (Online) */}
+                {/* SECTION 3: Day Tours Grid */}
                 <section>
                     <div className="flex justify-between items-center mb-6 px-2">
-                        <h2 className="text-2xl font-bold">Online Experiences</h2>
-                        <span className="text-sm font-bold text-rasta-green cursor-pointer hover:underline">View All</span>
+                        <div>
+                            <h2 className="text-2xl font-bold">Day Tours & Experiences</h2>
+                            <p className="text-foreground/60 text-sm mt-1">Short visits to connect with the village vibe.</p>
+                        </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {online.map((exp) => (
-                            <div key={exp.id} className="group cursor-pointer flex flex-col gap-3">
-                                <div className="relative aspect-square rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                                    <img src={exp.image} alt={exp.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                                    <div className="absolute bottom-2 left-2 px-2 py-1 bg-white/90 backdrop-blur text-xs font-bold rounded">
-                                        Online
+                        {dayTours.map((tour) => (
+                            <div key={tour.id} className="group cursor-pointer flex flex-col gap-3">
+                                <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all border border-foreground/5">
+                                    <img src={tour.image} alt={tour.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                    <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-md px-2 py-1 rounded-full text-xs font-bold text-rasta-green shadow-sm">
+                                        {tour.price}
+                                    </div>
+                                    <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/60 backdrop-blur text-white text-[10px] font-bold uppercase tracking-wider rounded">
+                                        {tour.badge}
                                     </div>
                                 </div>
-                                <div>
+                                <div className="flex flex-col gap-1">
                                     <div className="flex justify-between items-start">
-                                        <h3 className="font-bold text-base leading-snug group-hover:text-rasta-green transition-colors">{exp.title}</h3>
-                                        <div className="flex items-center gap-1 text-xs font-bold">
-                                            <Star size={10} fill="currentColor" className="text-rasta-yellow" /> {exp.rating}
+                                        <h3 className="font-bold text-base leading-tight group-hover:text-rasta-green transition-colors">{tour.title}</h3>
+                                        <div className="flex items-center gap-1 text-xs font-bold whitespace-nowrap">
+                                            <Star size={10} fill="currentColor" className="text-rasta-yellow" /> {tour.rating}
                                         </div>
                                     </div>
-                                    <div className="text-sm text-foreground/60 mt-1">{exp.price} • {exp.duration}</div>
+                                    <p className="text-xs text-foreground/60 line-clamp-2">{tour.description}</p>
+                                    <div className="flex items-center gap-3 text-xs text-foreground/40 mt-1 font-medium">
+                                        <div className="flex items-center gap-1"><Clock size={10} /> {tour.duration}</div>
+                                        <div>•</div>
+                                        <div>{tour.date}</div>
+                                    </div>
                                 </div>
                             </div>
                         ))}
                     </div>
                 </section>
+
+
 
             </div>
         </div>

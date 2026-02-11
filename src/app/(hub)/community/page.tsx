@@ -9,6 +9,7 @@ import { useState } from "react";
 export default function CommunityPage() {
     const [posts, setPosts] = useState<Post[]>(MOCK_POSTS);
     const [content, setContent] = useState("");
+    const [searchQuery, setSearchQuery] = useState("");
 
     // Use the first user as the "current user"
     const currentUser = MOCK_USERS[1];
@@ -29,10 +30,20 @@ export default function CommunityPage() {
         setContent("");
     };
 
+    const filteredPosts = posts.filter(post =>
+        post.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        post.user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        post.user.username.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
         <div className="min-h-screen bg-background text-foreground flex flex-col">
             {/* Feed Header */}
-            <SearchBar placeholder="Search reasoning..." />
+            <SearchBar
+                placeholder="Search reasoning..."
+                value={searchQuery}
+                onChange={setSearchQuery}
+            />
 
             {/* New Post Composer */}
             <div className="p-4 border-b border-foreground/5 flex gap-4">
@@ -59,7 +70,7 @@ export default function CommunityPage() {
 
             {/* Feed */}
             <div className="flex flex-col pb-20">
-                {posts.map((post) => (
+                {filteredPosts.map((post) => (
                     <PostCard key={post.id} post={post} />
                 ))}
             </div>

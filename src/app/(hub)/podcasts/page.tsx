@@ -7,10 +7,21 @@ import { useState } from "react";
 
 export default function PodcastsPage() {
     const [nowPlaying, setNowPlaying] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const filteredPodcasts = MOCK_PODCASTS.filter(p =>
+        p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.episode.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.host.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     return (
         <div className="min-h-screen bg-background text-foreground flex flex-col pb-24">
-            <SearchBar placeholder="Search audio & episodes..." />
+            <SearchBar
+                placeholder="Search audio & episodes..."
+                value={searchQuery}
+                onChange={setSearchQuery}
+            />
 
             <div className="p-6 grid gap-6">
                 {/* Featured Episode (Hero) */}
@@ -31,7 +42,7 @@ export default function PodcastsPage() {
                 {/* Episode List */}
                 <div className="space-y-4">
                     <h3 className="font-bold text-lg px-2">Recent Episodes</h3>
-                    {MOCK_PODCASTS.map((podcast) => (
+                    {filteredPodcasts.map((podcast) => (
                         <div key={podcast.id} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-foreground/5 transition-colors group cursor-pointer" onClick={() => setNowPlaying(podcast.id)}>
                             <div className="relative size-16 rounded-xl overflow-hidden bg-foreground/10 shrink-0">
                                 <img src={podcast.image} alt={podcast.title} className="w-full h-full object-cover" />
