@@ -57,7 +57,7 @@ export default function ShopPage() {
             <div className="flex flex-col gap-8 px-4 py-6">
 
                 {/* 1. Hero: Featured Vendor / Marketplace Highlight */}
-                <section className="relative aspect-[2/1] md:aspect-[3/1] rounded-2xl overflow-hidden shadow-xl group cursor-pointer border border-foreground/5">
+                <section className="relative aspect-[4/3] sm:aspect-[2/1] md:aspect-[3/1] rounded-2xl overflow-hidden shadow-xl group cursor-pointer border border-foreground/5">
                     <img src="/images/shop/roots%20tonic.jpg" alt="Featured Roots Tonic" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                     <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
                     <div className="absolute inset-0 p-6 flex flex-col justify-center items-start">
