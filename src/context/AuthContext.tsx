@@ -124,7 +124,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const signOut = async () => {
         await supabase.auth.signOut();
         // Use hard redirect to ensure auth state clears fully across all cached routes
-        window.location.href = "/";
+        window.location.href = "/login";
     };
 
     return (

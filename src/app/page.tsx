@@ -1,232 +1,208 @@
-"use client";
+import { ArrowRight, MapPin, History, Users, Leaf, Music, Utensils } from "lucide-react";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
-import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
-import { useRouter } from "next/navigation";
-import { Loader2, Mail, Lock, ArrowRight, User } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
+export default function Home() {
+  return (
+    <main className="min-h-screen flex flex-col bg-background relative overflow-x-hidden">
+      {/* Tri-color Accent Bar */}
+      <div className="h-2 w-full flex sticky top-0 z-50">
+        <div className="flex-1 bg-rasta-red"></div>
+        <div className="flex-1 bg-rasta-yellow"></div>
+        <div className="flex-1 bg-rasta-green"></div>
+      </div>
 
-export default function RootAuthPage() {
-    const [isLogin, setIsLogin] = useState(true);
-    const [email, setEmail] = useState("");
-    const [username, setUsername] = useState(""); 
-    const [password, setPassword] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [successMsg, setSuccessMsg] = useState<string | null>(null);
-    const router = useRouter();
-    const { user, isLoading } = useAuth();
-
-    // Redirect authenticated users to the community hub
-    useEffect(() => {
-        if (!isLoading && user) {
-            router.push("/community");
-        }
-    }, [user, isLoading, router]);
-
-    const handleEmailAuth = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-        setError(null);
-        setSuccessMsg(null);
-
-        try {
-            if (isLogin) {
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) throw error;
-                router.push("/community");
-            } else {
-                const { error, data } = await supabase.auth.signUp({ 
-                    email, 
-                    password,
-                    options: {
-                        data: {
-                            full_name: username
-                        }
-                    }
-                });
-                if (error) throw error;
-                
-                if (data.session) {
-                    router.push("/community");
-                } else {
-                    setSuccessMsg("Success! Please check your email to confirm your account.");
-                }
-            }
-        } catch (err: any) {
-            setError(err.message || "An error occurred during authentication.");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleGoogleAuth = async () => {
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: `${window.location.origin}/community`
-            }
-        });
-        if (error) setError(error.message);
-    };
-
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
-                <Loader2 className="w-12 h-12 animate-spin text-rasta-green" />
-            </div>
-        );
-    }
-
-    if (user) {
-        return null; // Prevent flicker while redirecting
-    }
-
-    return (
-        <div className="min-h-screen bg-background text-foreground flex grid lg:grid-cols-2">
-            
-            {/* LEFT: Branding/Hero Pane */}
-            <div className="hidden lg:flex flex-col justify-end p-12 relative isolate bg-black">
-                <img 
-                    src="/riv-logo.webp" 
-                    alt="RIV Background" 
-                    className="absolute inset-0 w-full h-full object-cover opacity-30 select-none pointer-events-none mix-blend-luminosity"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent" />
-                
-                <div className="relative z-10 max-w-xl">
-                    <div className="inline-block px-3 py-1 bg-rasta-red text-white text-xs font-bold uppercase tracking-widest rounded-full mb-6">
-                        Welcome to our village
-                    </div>
-                    <h1 className="text-5xl font-black text-white leading-[1.1] mb-6">
-                        Connect With <br/>
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-rasta-red via-rasta-yellow to-rasta-green">
-                            Rastafari Indigenous Village.
-                        </span>
-                    </h1>
-                    <p className="text-white/70 text-lg leading-relaxed">
-                        Access the Rastafari Indigenous Village digital platform. Stream podcasts, secure retreats, buy from local artisans, and reason with the worldwide community.
-                    </p>
-                </div>
-            </div>
-
-            {/* RIGHT: Login Core */}
-            <div className="flex flex-col justify-center items-center p-6 md:p-12 relative">
-                
-                <div className="w-full max-w-md flex flex-col gap-8">
-                    
-                    {/* Header */}
-                    <div className="text-center lg:text-left">
-                        <div className="lg:hidden flex justify-center mb-6">
-                            <img src="/riv-logo.webp" className="w-16 h-16 rounded-full" alt="RIV" />
-                        </div>
-                        <h2 className="text-3xl font-black">{isLogin ? "Sign In" : "Create Account"}</h2>
-                        <p className="text-foreground/60 mt-2 text-sm">
-                            {isLogin ? "Welcome back. Reason with us." : "Join the digital village today."}
-                        </p>
-                    </div>
-
-                    {/* OAuth Box */}
-                    <div className="flex flex-col gap-4">
-                        <button 
-                            onClick={handleGoogleAuth}
-                            className="w-full relative flex items-center justify-center gap-3 px-4 py-3.5 bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 rounded-2xl font-bold transition-all"
-                        >
-                            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                            </svg>
-                            Continue with Google
-                        </button>
-
-                        <div className="flex items-center gap-4 py-2">
-                            <div className="flex-1 h-px bg-foreground/10"></div>
-                            <span className="text-xs font-bold text-foreground/40 uppercase tracking-wider">OR EMAIL</span>
-                            <div className="flex-1 h-px bg-foreground/10"></div>
-                        </div>
-                    </div>
-
-                    {/* Email/Password Form */}
-                    <form onSubmit={handleEmailAuth} className="flex flex-col gap-4">
-                        
-                        {!isLogin && (
-                            <div className="relative">
-                                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/40 w-5 h-5" />
-                                <input 
-                                    type="text"
-                                    placeholder="Username or Full Name"
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    className="w-full bg-foreground/5 border border-foreground/10 rounded-2xl py-3.5 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-rasta-yellow/50 transition-all font-medium"
-                                    required={!isLogin}
-                                />
-                            </div>
-                        )}
-
-                        <div className="relative">
-                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/40 w-5 h-5" />
-                            <input 
-                                type="email"
-                                placeholder="Email address"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="w-full bg-foreground/5 border border-foreground/10 rounded-2xl py-3.5 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-rasta-yellow/50 transition-all font-medium"
-                                required
-                            />
-                        </div>
-
-                        <div className="relative">
-                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/40 w-5 h-5" />
-                            <input 
-                                type="password"
-                                placeholder="Password (min 6 characters)"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full bg-foreground/5 border border-foreground/10 rounded-2xl py-3.5 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-rasta-yellow/50 transition-all font-medium"
-                                required
-                                minLength={6}
-                            />
-                        </div>
-
-                        {error && (
-                            <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-500 font-bold text-sm rounded-xl">
-                                {error}
-                            </div>
-                        )}
-                        
-                        {successMsg && (
-                            <div className="p-3 bg-green-500/10 border border-green-500/20 text-green-500 font-bold text-sm rounded-xl">
-                                {successMsg}
-                            </div>
-                        )}
-
-                        <button 
-                            type="submit"
-                            disabled={loading}
-                            className="w-full flex items-center justify-center gap-2 py-3.5 bg-foreground text-background font-bold rounded-2xl mt-2 hover:opacity-90 transition-opacity disabled:opacity-50"
-                        >
-                            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (isLogin ? "Sign In" : "Create Account")}
-                            {!loading && <ArrowRight className="w-4 h-4" />}
-                        </button>
-                    </form>
-
-                    {/* Toggle Mode */}
-                    <div className="text-center pt-2 border-t border-foreground/5">
-                        <p className="text-sm text-foreground/60">
-                            {isLogin ? "Don't have an account?" : "Already apart of the village?"}
-                            <button 
-                                onClick={() => { setIsLogin(!isLogin); setError(null); setSuccessMsg(null); }}
-                                className="ml-2 font-bold text-foreground hover:text-rasta-green transition-colors"
-                            >
-                                {isLogin ? "Sign Up" : "Log In"}
-                            </button>
-                        </p>
-                    </div>
-
-                </div>
-            </div>
+      {/* Hero Section */}
+      <section className="relative min-h-[90vh] flex items-center justify-center isolate">
+        {/* Background Image */}
+        <div className="absolute inset-0 -z-10">
+          <img
+            src="/images/River-768x424.jpg"
+            alt="Rastafari Indigenous Village River"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
         </div>
-    );
+
+        <div className="container px-6 md:px-12 text-center text-white z-10 flex flex-col items-center gap-8 animate-in fade-in zoom-in duration-1000">
+          <div className="w-32 md:w-48 mb-4">
+            <img src="/riv-logo.webp" alt="RIV Logo" className="w-full h-auto drop-shadow-2xl" />
+          </div>
+
+          <h1 className="text-3xl md:text-7xl font-black tracking-tight leading-tight max-w-4xl drop-shadow-lg">
+            Preserving Traditions.<br />
+            Protecting Nature.<br />
+            <span className="text-rasta-yellow">Promoting Life.</span>
+          </h1>
+
+          <p className="text-lg md:text-2xl font-medium max-w-2xl text-white/90 drop-shadow-md">
+            Welcome to the Rastafari Indigenous Village. A sanctuary for culture, healing, and connection.
+          </p>
+
+          <Link href="/community">
+            <button className="group relative px-8 py-4 md:px-10 md:py-5 rounded-full bg-rasta-green text-white font-bold text-lg md:text-xl shadow-[0_0_20px_rgba(0,166,81,0.5)] hover:shadow-[0_0_30px_rgba(0,166,81,0.7)] hover:scale-105 transition-all duration-300 flex items-center gap-3 mt-4 border border-white/20">
+              Enter Community Platform
+              <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+            </button>
+          </Link>
+        </div>
+      </section>
+
+      {/* About Us */}
+      <section className="py-20 px-6 md:px-12 bg-background relative z-10">
+        <div className="container mx-auto max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
+          <div className="space-y-6">
+            <span className="text-rasta-red font-bold tracking-widest uppercase text-sm">Our Story</span>
+            <h2 className="text-4xl md:text-5xl font-black text-foreground leading-tight">
+              More Than A Visit.<br />
+              A Homecoming.
+            </h2>
+            <div className="space-y-4 text-foreground/80 text-lg leading-relaxed">
+              <p>
+                Come visit a community that preserves traditions, protects the natural environment, and promotes the Rastafari way of life. Wake up to the sound of songbirds, river water and the chanting/drumming of traditional Rastafari music in the Tabernacle.
+              </p>
+              <p>
+                Walk down a flower lined path to the garden and harvest some callaloo or cacao, and bring it up to our Ital kitchen that cooks the most delicious and authentic plant based food on the island. Pound your own cacao for chocolate tea; press your own cane juice; help make recipes that originated in Africa.
+              </p>
+            </div>
+          </div>
+          <div className="relative">
+            <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl rotate-3 hover:rotate-0 transition-all duration-500 border-4 border-background">
+              <img src="/images/Food-Spread-1024x768.jpeg" alt="Ital Food Preparation" className="w-full h-full object-cover" />
+            </div>
+            <div className="absolute -bottom-10 -left-10 w-2/3 aspect-video rounded-2xl overflow-hidden shadow-2xl -rotate-3 hover:rotate-0 transition-all duration-500 border-4 border-background hidden md:block">
+              <img src="/images/Z62_5334-768x511.jpg" alt="Artisan Drum Making" className="w-full h-full object-cover" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Community Pillars Grid */}
+      <section className="py-20 px-6 md:px-12 bg-foreground/5 relative">
+        <div className="container mx-auto max-w-6xl text-center mb-16">
+          <h2 className="text-3xl md:text-5xl font-black mb-6">A Thriving Village Economy</h2>
+          <p className="text-xl text-foreground/60 max-w-2xl mx-auto">
+            The RIV Community platform connects every aspect of our village life, creating a space for members, artisans, curious souls, and creators.
+          </p>
+        </div>
+
+        <div className="container mx-auto max-w-7xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Pillar 1: Artisans */}
+          <div className="bg-background p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 group">
+            <div className="size-14 rounded-2xl bg-rasta-yellow/10 text-rasta-yellow flex items-center justify-center mb-6 group-hover:bg-rasta-yellow group-hover:text-black transition-colors">
+              <Users size={28} />
+            </div>
+            <h3 className="text-xl font-bold mb-3">Artisans & Craftsmen</h3>
+            <p className="text-foreground/60">
+              Learn how to make drums and soap by hand. Support local creators preserving traditional Rastafari techniques.
+            </p>
+          </div>
+
+          {/* Pillar 2: Retreat Leaders */}
+          <div className="bg-background p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 group">
+            <div className="size-14 rounded-2xl bg-rasta-green/10 text-rasta-green flex items-center justify-center mb-6 group-hover:bg-rasta-green group-hover:text-white transition-colors">
+              <Leaf size={28} />
+            </div>
+            <h3 className="text-xl font-bold mb-3">Retreat Curators</h3>
+            <p className="text-foreground/60">
+              Host and attend immersive 5-day retreats. Connect with nature and find healing in the valley.
+            </p>
+          </div>
+
+          {/* Pillar 3: Creators */}
+          <div className="bg-background p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 group">
+            <div className="size-14 rounded-2xl bg-rasta-red/10 text-rasta-red flex items-center justify-center mb-6 group-hover:bg-rasta-red group-hover:text-white transition-colors">
+              <Music size={28} />
+            </div>
+            <h3 className="text-xl font-bold mb-3">Creators & Musicians</h3>
+            <p className="text-foreground/60">
+              Share music, stories, and educational content. A platform for the voices of the village to be heard globally.
+            </p>
+          </div>
+
+          {/* Pillar 4: Spiritual */}
+          <div className="bg-background p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 group">
+            <div className="size-14 rounded-2xl bg-foreground/5 text-foreground flex items-center justify-center mb-6 group-hover:bg-foreground group-hover:text-background transition-colors">
+              <Utensils size={28} />
+            </div>
+            <h3 className="text-xl font-bold mb-3">Natural Living</h3>
+            <p className="text-foreground/60">
+              Ital cooking, natural farming, and herbal medicine. Wisdom for a healthy mind, body, and spirit.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* History & Location */}
+      <section className="py-20 px-6 md:px-12 bg-background">
+        <div className="container mx-auto max-w-6xl flex flex-col md:flex-row gap-12">
+
+          {/* History Card */}
+          <div className="flex-1 bg-foreground/5 rounded-3xl p-8 md:p-12 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-8 text-foreground/5 select-none pointer-events-none">
+              <History size={200} />
+            </div>
+            <h3 className="text-2xl font-bold mb-4 relative z-10">Our History</h3>
+            <p className="text-foreground/70 leading-relaxed mb-6 relative z-10">
+              Founded in 2007, the Village has been in a process of constant evolution. Its purpose has always been the preservation, protection and promotion of the traditional Rastafari way of life.
+            </p>
+            <div className="relative z-10 mt-auto">
+              <div className="h-48 w-full rounded-xl overflow-hidden mt-4">
+                <img src="/images/Firstman-_-Nereri-BW-1-768x576.jpg" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 hover:scale-105" alt="RIV Founding History" />
+              </div>
+            </div>
+          </div>
+
+          {/* Location Card */}
+          <div className="flex-1 bg-foreground text-background rounded-3xl p-8 md:p-12 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-8 text-background/5 select-none pointer-events-none">
+              <MapPin size={200} />
+            </div>
+            <h3 className="text-2xl font-bold mb-4 relative z-10">Location</h3>
+            <p className="opacity-70 leading-relaxed mb-6 relative z-10">
+              The Village sits alongside the beautiful Montego Valley River, just twenty minutes from the Sangster International Airport and downtown Montego Bay.
+            </p>
+            <div className="relative z-10 mt-auto">
+              <div className="h-48 w-full rounded-xl overflow-hidden mt-4">
+                <img src="/images/DJI_0073-retreats-768x519.jpeg" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-700 hover:scale-105" alt="Montego Valley River" />
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* Footer / Final CTA */}
+      <section className="py-24 px-6 md:px-12 bg-cover bg-center relative isolate" style={{ backgroundImage: "url('/images/Ceremonial-1f35b70-1-768x1024.jpg')" }}>
+        <div className="absolute inset-0 bg-black/70 -z-10"></div>
+        <div className="container mx-auto max-w-4xl text-center text-white">
+          <h2 className="text-4xl md:text-6xl font-black mb-6">Welcome Home.</h2>
+          <p className="text-xl md:text-2xl text-white/80 max-w-2xl mx-auto mb-10">
+            "The Village is an actual, functioning community that is home to several families... Visitors are welcomed as honored guests."
+          </p>
+          <Link href="/community">
+            <button className="px-10 py-5 rounded-full bg-white text-black font-bold text-xl hover:bg-rasta-yellow transition-colors shadow-2xl">
+              Join the Community
+            </button>
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-[var(--sidebar-left)] text-white/50 py-12 px-6 border-t border-white/5">
+        <div className="container mx-auto max-w-6xl flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-2">
+            <img src="/riv-logo.webp" alt="RIV" className="h-8" />
+            <span className="text-sm">© 2026 Rastafari Indigenous Village. All rights reserved.</span>
+          </div>
+          <div className="flex gap-6 text-sm font-medium">
+            <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>
+            <Link href="#" className="hover:text-white transition-colors">Contact Us</Link>
+          </div>
+        </div>
+      </footer>
+    </main>
+  );
 }
