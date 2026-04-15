@@ -1,10 +1,12 @@
 "use client";
 
-import { MOCK_VIDEOS, MOCK_CHANNELS, MOCK_SERIES, MOCK_USERS } from "@/lib/mock-data";
-import { Play, CheckCircle2, Flame, TrendingUp, Users, Sparkles, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { Play, CheckCircle2, Flame, TrendingUp, Users, Sparkles, ChevronLeft, ChevronRight, Plus, Share2 } from "lucide-react";
 import { SearchBar } from "@/components/ui/search-bar";
-import { useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
+import { ShareButton } from "@/components/ui/share-button";
+
 
 // Categories tailored for "Shows"
 const CATEGORIES = ["All", "Originals", "Docu-Series", "Culture", "Farming", "Cooking", "News"];
@@ -17,6 +19,34 @@ export default function ChannelsPage() {
     const newEpisodesRef = useRef<HTMLDivElement>(null);
     const popularRef = useRef<HTMLDivElement>(null);
 
+    // Data State
+    const [series, setSeries] = useState<any[]>([]);
+    const [videos, setVideos] = useState<any[]>([]);
+    const [channels, setChannels] = useState<any[]>([]);
+    const [profiles, setProfiles] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const [
+                { data: sData },
+                { data: vData },
+                { data: cData },
+                { data: pData }
+            ] = await Promise.all([
+                supabase.from('series').select('*'),
+                supabase.from('videos').select('*'),
+                supabase.from('channels').select('*'),
+                supabase.from('profiles').select('*')
+            ]);
+            
+            if (sData) setSeries(sData);
+            if (vData) setVideos(vData);
+            if (cData) setChannels(cData);
+            if (pData) setProfiles(pData);
+        };
+        fetchData();
+    }, []);
+
     const scroll = (ref: React.RefObject<HTMLDivElement | null>, direction: 'left' | 'right') => {
         if (ref.current) {
             const scrollAmount = direction === 'left' ? -300 : 300;
@@ -25,18 +55,17 @@ export default function ChannelsPage() {
     };
 
     // Filter logic
-    const featuredSeries = MOCK_SERIES[0]; // Spotlight: Cooking with Sister Irie
-    const originalSeries = MOCK_SERIES; // List all series as originals
-    const latestEpisodes = MOCK_VIDEOS.slice(0, 6); // Just grab recent videos
-    const popularVideos = MOCK_VIDEOS.filter(v => parseInt(v.views) > 3);
+    const featuredSeries = series.length > 0 ? series[0] : null;
+    const originalSeries = series; 
+    const latestEpisodes = videos.slice(0, 6); 
 
     // Helper: Find Host Avatar (User or Channel)
     const getHostAvatar = (hostName: string) => {
-        const user = MOCK_USERS.find(u => u.name === hostName);
+        const user = profiles.find(u => u.name === hostName);
         if (user) return user.avatar;
-        const channel = MOCK_CHANNELS.find(c => c.name === hostName);
+        const channel = channels.find(c => c.name === hostName);
         if (channel) return channel.avatar;
-        return '/images/riv-logo.webp'; // Fallback
+        return '/riv-logo.webp'; // Fallback
     };
 
     // Helper for Section Headers with Scroll Controls
@@ -86,7 +115,7 @@ export default function ChannelsPage() {
             <div className="flex flex-col gap-12 px-6">
 
                 {/* 1. HERO: Featured Series */}
-                {selectedCategory === "All" && (
+                {selectedCategory === "All" && featuredSeries && (
                     <section className="relative aspect-[4/5] md:aspect-[21/9] rounded-3xl overflow-hidden shadow-2xl group cursor-pointer isolate">
                         {/* Background Image */}
                         <img
@@ -124,7 +153,16 @@ export default function ChannelsPage() {
                                 <button className="p-3.5 bg-white/10 backdrop-blur text-white font-bold rounded-full hover:bg-white/20 transition-colors border border-white/10">
                                     <Plus size={20} />
                                 </button>
-                            </div>
+                                <ShareButton 
+                                    item={{
+                                        type: 'channel_share',
+                                        title: featuredSeries.title,
+                                        image: featuredSeries.cover,
+                                        data: featuredSeries
+                                    }}
+                                    className="p-3.5 bg-white/10 backdrop-blur text-white font-bold rounded-full hover:bg-white/20 transition-colors border border-white/10"
+                                />
+                             </div>
                         </div>
                     </section>
                 )}
@@ -138,13 +176,22 @@ export default function ChannelsPage() {
                                 {/* Vertical Poster */}
                                 <div className="relative aspect-[2/3] rounded-xl overflow-hidden shadow-md group-hover:shadow-xl transition-all duration-300 group-hover:-translate-y-1">
                                     <img src={series.thumbnail} alt={series.title} className="w-full h-full object-cover" />
-                                    <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors" />
-                                    {/* Logo/Title Overlay on Hover? Maybe purely visual */}
+                                    <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                        <ShareButton 
+                                            item={{
+                                                type: 'channel_share',
+                                                title: series.title,
+                                                image: series.thumbnail,
+                                                data: series
+                                            }}
+                                            className="p-2 bg-black/40 backdrop-blur-md rounded-full text-white hover:bg-rasta-green transition-colors shadow-lg"
+                                        />
+                                    </div>
                                 </div>
 
                                 <div>
                                     <h3 className="font-bold text-sm leading-tight mb-1 group-hover:text-rasta-green truncate">{series.title}</h3>
-                                    <p className="text-xs text-foreground/50">{series.episodes.length} Episodes</p>
+                                    <p className="text-xs text-foreground/50">{series?.episodes?.length || 0} Episodes</p>
                                 </div>
                             </div>
                         ))}
@@ -155,7 +202,7 @@ export default function ChannelsPage() {
                 <section>
                     <SectionHeader title="Meet the Broadcasters" icon={Users} />
                     <div className="flex gap-6 overflow-x-auto no-scrollbar pb-4">
-                        {MOCK_CHANNELS.map(channel => (
+                        {channels.map(channel => (
                             <div key={channel.id} className="flex flex-col items-center gap-3 shrink-0 group cursor-pointer min-w-[100px]">
                                 <div className="size-24 rounded-full p-0.5 bg-gradient-to-tr from-rasta-red via-rasta-yellow to-rasta-green group-hover:scale-105 transition-transform shadow-lg">
                                     <div className="size-full rounded-full border-4 border-background overflow-hidden relative">
@@ -179,6 +226,17 @@ export default function ChannelsPage() {
                             <div key={video.id} className="snap-center shrink-0 w-[280px] md:w-[320px] group cursor-pointer flex flex-col gap-3">
                                 <div className="relative aspect-video rounded-xl overflow-hidden bg-foreground/10">
                                     <img src={video.thumbnail} alt={video.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                    <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                        <ShareButton 
+                                            item={{
+                                                type: 'channel_share',
+                                                title: video.title,
+                                                image: video.thumbnail,
+                                                data: video
+                                            }}
+                                            className="p-2 bg-black/40 backdrop-blur-md rounded-full text-white hover:bg-rasta-red transition-colors shadow-lg"
+                                        />
+                                    </div>
                                     <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs font-bold px-1.5 py-0.5 rounded flex items-center gap-1">
                                         <Play size={10} className="fill-white" /> {video.duration}
                                     </div>
@@ -186,12 +244,12 @@ export default function ChannelsPage() {
                                 </div>
                                 <div className="flex gap-3">
                                     <div className="size-9 rounded-full overflow-hidden shrink-0 border border-foreground/10 bg-foreground/5">
-                                        <img src={video.channel.avatar} alt={video.channel.name} className="w-full h-full object-cover" />
+                                        <img src={video?.channel?.avatar} alt={video?.channel?.name} className="w-full h-full object-cover" />
                                     </div>
                                     <div className="flex-1">
                                         <h3 className="font-bold text-sm leading-snug mb-1 group-hover:text-rasta-green line-clamp-2">{video.title}</h3>
                                         <div className="text-xs text-foreground/60 flex items-center gap-1">
-                                            <span>{video.channel.name}</span>
+                                            <span>{video?.channel?.name}</span>
                                             <span className="text-[8px]">•</span>
                                             <span>{video.time}</span>
                                         </div>

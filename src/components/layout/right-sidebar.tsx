@@ -1,6 +1,19 @@
+"use client";
+
 import { Calendar, Sun } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 export function RightSidebar() {
+    const [ceremonies, setCeremonies] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchCeremonies = async () => {
+             const { data } = await supabase.from('retreats').select('*').limit(3);
+             if (data) setCeremonies(data);
+        };
+        fetchCeremonies();
+    }, []);
     return (
         <aside className="hidden lg:flex flex-col w-80 sticky top-4 h-[calc(100vh-2rem)] p-6 ml-4 mr-4 rounded-3xl bg-[var(--sidebar-right)] shadow-2xl border border-foreground/5 overflow-y-auto no-scrollbar">
 
@@ -13,7 +26,7 @@ export function RightSidebar() {
                 <p className="font-medium text-lg italic text-foreground/80">
                     "The stone that the builder refused will always be the head cornerstone."
                 </p>
-                <div className="mt-2 text-xs text-foreground/40 text-right">— Village Elder</div>
+                <div className="mt-2 text-xs text-foreground/40 text-right">— Village Creator</div>
             </div>
 
             {/* Upcoming Ceremonies */}
@@ -23,22 +36,20 @@ export function RightSidebar() {
                     Ceremonies & Retreats
                 </h3>
                 <div className="space-y-4">
-                    {[
-                        { date: "Feb 12", title: "Earthstrong Celebration", time: "6:00 PM", type: "Gathering" },
-                        { date: "Feb 15", title: "Nyahbinghi Drumming", time: "Sunset", type: "Ceremony" },
-                        { date: "Feb 20", title: "Community Farming", time: "Early Morn", type: "Service" },
-                    ].map((item, i) => (
+                    {ceremonies.map((item, i) => {
+                        const dateParts = item.date ? item.date.split(" ") : ["Upcoming", "Soon"];
+                        return (
                         <div key={i} className="flex gap-4 items-center group cursor-pointer">
                             <div className="flex flex-col items-center justify-center size-14 rounded-xl bg-foreground/5 group-hover:bg-foreground/10 transition-colors border border-foreground/5">
-                                <span className="text-xs font-bold text-foreground/50 uppercase">{item.date.split(" ")[0]}</span>
-                                <span className="text-lg font-bold text-foreground">{item.date.split(" ")[1]}</span>
+                                <span className="text-[10px] font-bold text-foreground/50 uppercase">{dateParts[0]?.substring(0, 3)}</span>
+                                <span className="text-lg font-bold text-foreground">{dateParts[1]?.replace(',', '') || "-"}</span>
                             </div>
-                            <div>
-                                <div className="font-bold text-foreground/90 group-hover:text-rasta-red transition-colors">{item.title}</div>
-                                <div className="text-xs text-foreground/50 font-medium">{item.time} • {item.type}</div>
+                            <div className="flex-1 min-w-0">
+                                <div className="font-bold text-foreground/90 group-hover:text-rasta-red transition-colors truncate">{item.title}</div>
+                                <div className="text-xs text-foreground/50 font-medium">{item.duration} • {item.category}</div>
                             </div>
                         </div>
-                    ))}
+                    )})}
                 </div>
             </div>
 

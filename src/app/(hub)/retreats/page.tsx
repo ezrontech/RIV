@@ -1,13 +1,24 @@
 "use client";
 
-import { MOCK_RETREATS } from "@/lib/mock-data";
-import { Star, Heart, Clock, Check, Calendar, MapPin, ChevronRight, ChevronLeft } from "lucide-react";
+import { Star, Heart, Clock, Check, Calendar, MapPin, ChevronRight, ChevronLeft, Share2 } from "lucide-react";
 import { SearchBar } from "@/components/ui/search-bar";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+import { ShareButton } from "@/components/ui/share-button";
 
 export default function RetreatsPage() {
+
     const [searchQuery, setSearchQuery] = useState("");
+    const [retreats, setRetreats] = useState<any[]>([]);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const { data } = await supabase.from('retreats').select('*');
+            if (data) setRetreats(data);
+        };
+        fetchData();
+    }, []);
 
     const scrollLeft = () => {
         if (scrollContainerRef.current) {
@@ -21,7 +32,7 @@ export default function RetreatsPage() {
         }
     };
 
-    const filteredRetreats = MOCK_RETREATS.filter(r =>
+    const filteredRetreats = retreats.filter(r =>
         r.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         r.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         r.category.toLowerCase().includes(searchQuery.toLowerCase())
@@ -60,9 +71,20 @@ export default function RetreatsPage() {
                             <div key={retreat.id} className="min-w-[300px] md:min-w-[340px] snap-center group cursor-pointer flex flex-col bg-background rounded-2xl overflow-hidden border border-foreground/5 hover:border-rasta-yellow/50 hover:shadow-xl transition-all duration-500">
                                 <div className="relative aspect-[4/3] overflow-hidden">
                                     <img src={retreat.image} alt={retreat.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                                    <button className="absolute top-3 right-3 p-2 rounded-full bg-black/20 backdrop-blur-md hover:bg-rasta-red text-white transition-colors">
-                                        <Heart size={16} />
-                                    </button>
+                                    <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                        <button className="p-2 rounded-full bg-black/40 backdrop-blur-md hover:bg-rasta-red text-white transition-colors shadow-lg">
+                                            <Heart size={16} />
+                                        </button>
+                                        <ShareButton 
+                                            item={{
+                                                type: 'retreat_share',
+                                                title: retreat.title,
+                                                image: retreat.image,
+                                                data: retreat
+                                            }}
+                                            className="p-2 rounded-full bg-black/40 backdrop-blur-md hover:bg-rasta-green text-white transition-colors shadow-lg"
+                                        />
+                                    </div>
                                     {retreat.badge && (
                                         <div className="absolute top-3 left-3 px-2 py-1 bg-rasta-green text-white text-[10px] font-bold uppercase tracking-wider rounded shadow-sm">
                                             {retreat.badge}
@@ -104,9 +126,20 @@ export default function RetreatsPage() {
                                     <div className="text-rasta-yellow font-bold text-sm mb-2 uppercase tracking-wide">Live Event</div>
                                     <h3 className="text-3xl font-bold text-white mb-3 leading-tight">{ceremony.title}</h3>
                                     <p className="text-white/70 line-clamp-2 mb-6 max-w-md">{ceremony.description}</p>
-                                    <button className="px-6 py-3 bg-rasta-red text-white font-bold rounded-full hover:bg-white hover:text-rasta-red transition-all flex items-center gap-2">
-                                        Join Ceremony <ChevronRight size={16} />
-                                    </button>
+                                    <div className="flex items-center gap-4">
+                                        <button className="px-6 py-3 bg-rasta-red text-white font-bold rounded-full hover:bg-white hover:text-rasta-red transition-all flex items-center gap-2">
+                                            Join Ceremony <ChevronRight size={16} />
+                                        </button>
+                                        <ShareButton 
+                                            item={{
+                                                type: 'event_share',
+                                                title: ceremony.title,
+                                                image: ceremony.image,
+                                                data: ceremony
+                                            }}
+                                            className="p-3 bg-white/10 backdrop-blur-md border border-white/10 rounded-full text-white hover:bg-white hover:text-black transition-colors"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -136,8 +169,19 @@ export default function RetreatsPage() {
                                 <div className="flex flex-col gap-1">
                                     <div className="flex justify-between items-start">
                                         <h3 className="font-bold text-base leading-tight group-hover:text-rasta-green transition-colors">{tour.title}</h3>
-                                        <div className="flex items-center gap-1 text-xs font-bold whitespace-nowrap">
-                                            <Star size={10} fill="currentColor" className="text-rasta-yellow" /> {tour.rating}
+                                        <div className="flex items-center gap-1.5">
+                                            <div className="flex items-center gap-1 text-xs font-bold whitespace-nowrap">
+                                                <Star size={10} fill="currentColor" className="text-rasta-yellow" /> {tour.rating}
+                                            </div>
+                                            <ShareButton 
+                                                item={{
+                                                    type: 'event_share',
+                                                    title: tour.title,
+                                                    image: tour.image,
+                                                    data: tour
+                                                }}
+                                                className="text-foreground/20 hover:text-foreground"
+                                            />
                                         </div>
                                     </div>
                                     <p className="text-xs text-foreground/60 line-clamp-2">{tour.description}</p>

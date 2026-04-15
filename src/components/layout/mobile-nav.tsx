@@ -6,9 +6,10 @@ import { useState, useEffect } from "react";
 import {
     Waves, Tv, Mic, Scroll, Menu, X,
     ShoppingBag, User, Hammer, Tent, Heart,
-    LogOut
+    LogOut, ShieldCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
 
 // Bottom Tab Items
 const TAB_ITEMS = [
@@ -34,6 +35,7 @@ const SIDEBAR_ITEMS = [
 export function MobileNav() {
     const pathname = usePathname();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const { profile, signOut } = useAuth();
 
     // Close sidebar on route change
     useEffect(() => {
@@ -96,23 +98,41 @@ export function MobileNav() {
                                     </Link>
                                 );
                             })}
+                            
+                            {/* Admin Link for Creators */}
+                            {profile?.role === 'creator' && (
+                                <Link
+                                    href="/admin/dashboard"
+                                    className={cn(
+                                        "flex items-center gap-4 px-4 py-3 rounded-xl transition-all mt-4 border border-rasta-yellow/20 bg-rasta-yellow/5",
+                                        pathname.startsWith("/admin")
+                                            ? "bg-rasta-yellow text-black font-bold border-none"
+                                            : "text-rasta-yellow"
+                                    )}
+                                >
+                                    <ShieldCheck size={22} />
+                                    <span>Admin Dashboard</span>
+                                </Link>
+                            )}
                         </nav>
 
                         {/* Footer Actions */}
                         <div className="mt-6 pt-6 border-t border-white/10 space-y-4">
-                            <button className="w-full py-3 rounded-full bg-rasta-green text-white font-bold flex items-center justify-center gap-2 shadow-lg shadow-rasta-green/20">
-                                <Heart size={18} className="fill-current" />
-                                <span>Support RIV</span>
-                            </button>
+                            <Link href="/support" className="block">
+                                <button className="w-full py-3 rounded-full bg-rasta-green text-white font-bold flex items-center justify-center gap-2 shadow-lg shadow-rasta-green/20">
+                                    <Heart size={18} className="fill-current" />
+                                    <span>Support</span>
+                                </button>
+                            </Link>
                             <div className="flex items-center gap-3 px-2">
                                 <div className="size-10 rounded-full bg-white/10 overflow-hidden">
-                                    <img src="/images/users/firstman.webp" alt="User" />
+                                    <img src={profile?.avatar || "/riv-logo.webp"} alt="User" />
                                 </div>
                                 <div className="flex-1">
-                                    <div className="text-sm font-bold text-white">Firstman</div>
-                                    <div className="text-xs text-white/50">Community Elder</div>
+                                    <div className="text-sm font-bold text-white line-clamp-1">{profile?.name || "Guest"}</div>
+                                    <div className="text-[10px] text-white/40 uppercase tracking-widest font-black">{profile?.role || "Member"}</div>
                                 </div>
-                                <button className="text-white/50 hover:text-rasta-red transition-colors">
+                                <button onClick={signOut} className="text-white/50 hover:text-rasta-red transition-colors">
                                     <LogOut size={20} />
                                 </button>
                             </div>

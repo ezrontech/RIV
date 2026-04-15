@@ -1,4 +1,4 @@
-import { User } from "@/lib/mock-data";
+import { User } from "@/types/schema";
 import { cn } from "@/lib/utils";
 
 interface AvatarProps {
@@ -7,19 +7,28 @@ interface AvatarProps {
 }
 
 export function Avatar({ user, className }: AvatarProps) {
-    const isImage = user.avatar.startsWith("http") || user.avatar.startsWith("/");
+    if (!user) {
+        return (
+            <div className={cn("size-10 rounded-full bg-foreground/10 flex items-center justify-center shrink-0 border border-foreground/5", className)}>
+                <div className="size-4 rounded-full bg-foreground/20 animate-pulse" />
+            </div>
+        );
+    }
+
+    const avatarUrl = user.avatar || "/riv-logo.webp";
+    const isImage = avatarUrl.startsWith("http") || avatarUrl.startsWith("/");
 
     if (isImage) {
         return (
-            <div className={cn("size-10 rounded-full overflow-hidden shrink-0 border border-foreground/10", className)}>
-                <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+            <div className={cn("size-10 rounded-full overflow-hidden shrink-0 border border-foreground/10 cursor-pointer", className)}>
+                <img src={avatarUrl} alt={user.name || "User"} className="w-full h-full object-cover" />
             </div>
         );
     }
 
     return (
-        <div className={cn("size-10 rounded-full flex items-center justify-center text-background font-bold text-sm overflow-hidden shrink-0", user.avatar, className)}>
-            {user.name.charAt(0)}
+        <div className={cn("size-10 rounded-full flex items-center justify-center text-background font-bold text-sm overflow-hidden shrink-0 cursor-pointer", avatarUrl, className)}>
+            {(user.name || user.username || "?").charAt(0).toUpperCase()}
         </div>
     );
 }

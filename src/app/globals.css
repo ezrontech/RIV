@@ -68,3 +68,19 @@ body {
   scrollbar-width: none;
   /* Firefox */
 }
+
+/* Global cursor pointers for clickable items */
+button, 
+[role="button"],
+label[for],
+label.cursor-pointer,
+input[type="submit"],
+input[type="button"],
+input[type="checkbox"],
+input[type="radio"] {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
