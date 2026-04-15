@@ -43,6 +43,19 @@ export interface Post {
     created_at?: string;
 }
 
+export interface Comment {
+    id: string;
+    post_id: string;
+    user_id: string;
+    parent_id: string | null;
+    content: string;
+    likes: number;
+    created_at: string;
+    user: User;
+    replies?: Comment[];
+    isLiked?: boolean;
+}
+
 export interface Series {
     id: string;
     title: string;

@@ -1,6 +1,6 @@
 "use client";
-
-import { Post } from "@/types/schema";
+ 
+import { Post, Comment } from "@/types/schema";
 import { Avatar } from "@/components/ui/avatar";
 import {
     Heart, MessageCircle, Repeat2,
@@ -13,20 +13,6 @@ import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { ShareButton } from "@/components/ui/share-button";
 import { isVideo } from "@/lib/media-utils";
-
-// ─── Types ───────────────────────────────────────────────────────────────────
-interface Comment {
-    id: string;
-    post_id: string;
-    user_id: string;
-    parent_id: string | null;
-    content: string;
-    likes: number;
-    created_at: string;
-    user: { id: string; username: string; name: string; avatar: string };
-    replies?: Comment[];
-    isLiked?: boolean;
-}
 
 interface PostCardProps {
     post: Post;
@@ -256,7 +242,7 @@ export function PostCard({ post, onDelete, onUserClick }: PostCardProps) {
 
             if (error) throw error;
 
-            const raw = (data || []).map((c: any) => ({
+            const raw: Comment[] = (data || []).map((c: any) => ({
                 ...c,
                 user: Array.isArray(c.user) ? c.user[0] : c.user,
                 replies: [],
@@ -280,15 +266,15 @@ export function PostCard({ post, onDelete, onUserClick }: PostCardProps) {
             }
 
             // Threading
-            const commentMap = new Map();
+            const commentMap = new Map<string, Comment>();
             const topLevel: Comment[] = [];
 
             raw.forEach(c => commentMap.set(c.id, { ...c }));
             raw.forEach(c => {
                 if (c.parent_id && commentMap.has(c.parent_id)) {
-                    commentMap.get(c.parent_id).replies.push(commentMap.get(c.id));
+                    commentMap.get(c.parent_id)!.replies!.push(commentMap.get(c.id)!);
                 } else if (!c.parent_id) {
-                    topLevel.push(commentMap.get(c.id));
+                    topLevel.push(commentMap.get(c.id)!);
                 }
             });
 
@@ -578,9 +564,7 @@ export function PostCard({ post, onDelete, onUserClick }: PostCardProps) {
             <div className={cn("flex gap-2", isReply && "ml-8 mt-1.5")}>
                 {isReply && <CornerDownRight size={12} className="shrink-0 mt-2 text-foreground/20" />}
                 <div onClick={() => onUserClick && comment.user?.id && onUserClick(comment.user.id)} className="shrink-0 cursor-pointer">
-                    <div className={cn("rounded-full overflow-hidden bg-foreground/10 border border-foreground/10", isReply ? "size-6" : "size-7")}>
-                        <img src={comment.user?.avatar || "/riv-logo.webp"} alt={comment.user?.username} className="w-full h-full object-cover" />
-                    </div>
+                    <Avatar user={comment.user} className={isReply ? "size-6" : "size-7"} />
                 </div>
                 <div className="flex-1 min-w-0">
                     <div className="bg-foreground/5 rounded-2xl px-3 py-2 inline-block max-w-full relative group/comm">
