@@ -45,8 +45,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         };
 
         fetchSession();
+        
+        // 2. Safety Timeout: Force loading to false after 7 seconds to prevent infinite spinner
+        const safetyTimeout = setTimeout(() => {
+            setIsLoading((loading) => {
+                if (loading) {
+                    console.warn("Auth check timed out, forcing render.");
+                    return false;
+                }
+                return false;
+            });
+        }, 7000);
 
-        // 2. Listen for auth changes
+        // 3. Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             async (_event, session) => {
                 setUser(session?.user ?? null);
@@ -59,7 +70,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             }
         );
 
-        return () => subscription.unsubscribe();
+        return () => {
+            subscription.unsubscribe();
+            clearTimeout(safetyTimeout);
+        };
     }, []);
 
     const fetchProfile = async (userId: string, retries = 3) => {
